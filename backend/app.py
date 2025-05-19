@@ -21,7 +21,9 @@ import jwt_config
 # pip install flask-jwt-extended
 
 app = Flask(__name__)
-CORS(app)
+# CORS(app)
+CORS(app, resources={r"/*": {"origins": "*"}})
+
 
 # Configure JWT
 app.config.from_object(jwt_config)
