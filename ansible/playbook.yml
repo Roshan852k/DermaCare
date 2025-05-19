@@ -35,6 +35,22 @@
         state: present
         src: manifests/frontend-service.yaml
 
+    - name: Apply backend HPA
+      kubernetes.core.k8s:
+        state: present
+        src: manifests/backend-hpa.yaml
+
+    - name: Apply ml-service HPA
+      kubernetes.core.k8s:
+        state: present
+        src: manifests/ml-service-hpa.yaml
+
+    - name: Apply frontend HPA
+      kubernetes.core.k8s:
+        state: present
+        src: manifests/frontend-hpa.yaml
+
+
     # - name: Port forward backend service
     #   ansible.builtin.shell: kubectl port-forward service/backend 5000:5000 &
     #   async: 3600
