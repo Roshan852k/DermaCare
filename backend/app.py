@@ -29,6 +29,9 @@ CORS(app, resources={r"/*": {"origins": "*"}})
 app.config.from_object(jwt_config)
 jwt = JWTManager(app)
 
+# Get the ML service URL from environment variable
+ml_service_url = os.getenv("ML_SERVICE_URL")
+
 # MongoDB Config
 client = MongoClient(url)
 
@@ -280,7 +283,8 @@ def create_request():
         print("Sending image to ML service...")
 
         # ml_response = requests.post("http://127.0.0.1:5001/predict", files=files)
-        ml_response = requests.post("http://ml-service:5001/predict", files=files)
+        # ml_response = requests.post("http://ml-service:5001/predict", files=files)
+        ml_response = requests.post(ml_service_url, files=files)
         
         
         print("ML service response status:", ml_response.status_code)
