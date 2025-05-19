@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: ml-service
-          image: roshany852k/ml-service:latest
+          image: iiitbroshan/ml-service:latest
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 5001
