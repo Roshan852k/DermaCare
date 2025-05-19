@@ -1,14 +1,27 @@
 - name: Deploy to Kubernetes using Ansible
   hosts: localhost
   gather_facts: false
+  vars_files:
+    - vault/secrets.yml 
+    
   collections:
     - kubernetes.core
 
   tasks:
+    - name: Render backend deployment template with secrets
+    template:
+      src: manifests/backend-deployment.yaml.j2
+      dest: /tmp/backend-deployment.yaml
+
     - name: Deploy backend
       kubernetes.core.k8s:
         state: present
-        src: manifests/backend-deployment.yaml
+        src: /tmp/backend-deployment.yaml
+        
+    # - name: Deploy backend
+    #   kubernetes.core.k8s:
+    #     state: present
+    #     src: manifests/backend-deployment.yaml
 
     - name: Expose backend
       kubernetes.core.k8s:
