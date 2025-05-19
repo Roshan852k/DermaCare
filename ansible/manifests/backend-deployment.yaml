@@ -24,4 +24,8 @@ spec:
               value: bVck39AsLz8KNJY_UIT3uhZfRuFNDBRWv91lFEq4bF0=
             - name: ML_SERVICE_URL
               value: http://ml-service:5001/predict
-
+          resources:
+            requests:
+              cpu: 100m
+            limits:
+              cpu: 500m
