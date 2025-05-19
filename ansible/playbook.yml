@@ -9,9 +9,9 @@
 
   tasks:
     - name: Render backend deployment template with secrets
-    template:
-      src: manifests/backend-deployment.yaml.j2
-      dest: /tmp/backend-deployment.yaml
+      template:
+        src: manifests/backend-deployment.yaml.j2
+        dest: /tmp/backend-deployment.yaml
 
     - name: Deploy backend
       kubernetes.core.k8s:
