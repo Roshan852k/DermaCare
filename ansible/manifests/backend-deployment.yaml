@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: backend
-          image: backend:latest
+          image: roshany852k/backend:latest
           imagePullPolicy: Never
           ports:
             - containerPort: 5000
