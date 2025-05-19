@@ -1,0 +1,51 @@
+- name: Deploy to Kubernetes using Ansible
+  hosts: localhost
+  gather_facts: false
+  collections:
+    - kubernetes.core
+
+  tasks:
+    - name: Deploy backend
+      kubernetes.core.k8s:
+        state: present
+        src: manifests/backend-deployment.yaml
+
+    - name: Expose backend
+      kubernetes.core.k8s:
+        state: present
+        src: manifests/backend-service.yaml
+
+    - name: Deploy ml-service
+      kubernetes.core.k8s:
+        state: present
+        src: manifests/ml-deployment.yaml
+
+    - name: Expose ml-service
+      kubernetes.core.k8s:
+        state: present
+        src: manifests/ml-service.yaml
+
+    - name: Deploy frontend
+      kubernetes.core.k8s:
+        state: present
+        src: manifests/frontend-deployment.yaml
+
+    - name: Expose frontend
+      kubernetes.core.k8s:
+        state: present
+        src: manifests/frontend-service.yaml
+
+    # - name: Port forward backend service
+    #   ansible.builtin.shell: kubectl port-forward service/backend 5000:5000 &
+    #   async: 3600
+    #   poll: 0
+
+    # - name: Port forward frontend service
+    #   ansible.builtin.shell: kubectl port-forward service/frontend 3000:3000 &
+    #   async: 3600
+    #   poll: 0
+
+    # - name: Port forward ml-service service
+    #   ansible.builtin.shell: kubectl port-forward service/ml-service 5001:5001 &
+    #   async: 3600
+    #   poll: 0
