@@ -13,10 +13,10 @@ const login = async (credentials) => {
       const { token, role, pid: userId } = response.data;
 
       if (role === 'doctor') {
-        console.log(token);
+        // console.log(token);
         localStorage.setItem('token_doctor', token);
       } else if (role === 'patient') {
-        console.log(token);
+        // console.log(token);
         localStorage.setItem(`token_patient_${userId}`, token);
       }
 
