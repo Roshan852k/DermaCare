@@ -6,7 +6,7 @@ const getPendingRequests = async () => {
   try {
     const role = 'doctor';  // fixed role
 
-    console.log('Using role:', role);
+    // console.log('Using role:', role);
 
     const tokenKey = `token_${role}`;  
     const token = localStorage.getItem(tokenKey);
