@@ -7,8 +7,8 @@ const pastdata = async (pid) => {
     const role = 'patient';  // hardcoded role
     const userId = pid;      // use pid as userId
 
-    console.log('Using role:', role);
-    console.log('Using userId:', userId);
+    // console.log('Using role:', role);
+    // console.log('Using userId:', userId);
 
     // Construct the token key using hardcoded role and pid
     const tokenKey = `token_${role}_${userId}`;
