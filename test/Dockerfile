@@ -7,7 +7,7 @@ COPY requirements.txt .
 RUN pip install -r requirements.txt
 
 # Copy test script and images
-COPY test_app.py .
+COPY test_model.py .
 COPY img/ img/
 
 # Run test
