@@ -14,6 +14,9 @@ COPY .env .env
 # Copy rest of the frontend code
 COPY . .
 
+# Log env var
+RUN echo "✅ Environment variable:" && grep REACT_APP_API_URL .env
+
 # Build the React app
 RUN npm run build
 
