@@ -2,8 +2,10 @@ import axios from 'axios';
 
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 
+
 const login = async (credentials) => {
   try {
+    console.log("REACT_APP_API_URL:", process.env.REACT_APP_API_URL);
     const response = await axios.post(`${API_URL}/verify`, credentials, {
       headers: { 'Content-Type': 'application/json' },
     });
