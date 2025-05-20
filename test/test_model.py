@@ -14,7 +14,7 @@ class FlaskAppTestCase(unittest.TestCase):
         with open(image_path, "rb") as img_file:
             files = {"image": img_file}
             response = requests.post(f"{BASE_URL}/predict", files=files)
-            # print("Response:", response.status_code, response.text)
+            print("Response:", response.status_code, response.text)
 
         self.assertEqual(response.status_code, 200)
         data = response.json()
@@ -22,7 +22,7 @@ class FlaskAppTestCase(unittest.TestCase):
 
     def test_predict_with_no_image(self):
         response = requests.post(f"{BASE_URL}/predict", files={})
-        # print("Response:", response.status_code, response.text)
+        print("Response:", response.status_code, response.text)
         
         self.assertEqual(response.status_code, 400)
         data = response.json()
@@ -31,7 +31,7 @@ class FlaskAppTestCase(unittest.TestCase):
     def test_predict_with_invalid_image(self):
         files = {"image": ("bad.txt", b"not an image")}
         response = requests.post(f"{BASE_URL}/predict", files=files)
-        # print("Response:", response.status_code, response.text)
+        print("Response:", response.status_code, response.text)
         
         self.assertIn(response.status_code, [400, 500])  # depends on your error handling
         data = response.json()
