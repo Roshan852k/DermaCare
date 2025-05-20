@@ -9,6 +9,8 @@ from bson import ObjectId
 import requests
 from io import BytesIO
 
+import logging
+
 from cred import url
 from encryption import encrypt_data, decrypt_data
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity, get_jwt
@@ -61,6 +63,13 @@ if counter_collection.count_documents({"_id": "user_pid"}) == 0:
 if counter_collection.count_documents({"_id": "patient_id"}) == 0:
     counter_collection.insert_one({"_id": "patient_id", "seq": 1000})
 
+# Set up logging
+logging.basicConfig(
+    filename='app.log',           # <--- This is the log file
+    level=logging.INFO,
+    format='%(asctime)s %(levelname)s: %(message)s'
+)
+
 # Auto-increment functions
 def get_next_user_pid():
     counter = counter_collection.find_one_and_update(
@@ -80,11 +89,13 @@ def register():
     name = data.get('name')
 
     if not all([username, password, email, name]):
+        logging.warning("Registration failed: Missing fields")
         return jsonify({"error": "All fields (username, password, email, name) are required"}), 400
 
     # Check if user already exists in MongoDB
     existing_user = user_collection.find_one({"username": username})
     if existing_user:
+        logging.warning(f"Registration failed: User {username} already exists")
         return jsonify({"error": "User already exists"}), 409
 
     # Encrypt the password
@@ -116,11 +127,13 @@ def login():
     password = data.get('password')
 
     if not username or not password:
+        logging.warning("Login failed: Missing username or password")
         return jsonify({"error": "Username and password are required"}), 400
 
     # Doctor login
     if username == "doctor" and password == "doctor123":
         access_token = create_access_token(identity="doctor",additional_claims={"role": "doctor"})
+        logging.info("Doctor login successful")
         return jsonify({
             "message": "Doctor authenticated",
             "role": "doctor",
@@ -130,15 +143,18 @@ def login():
     # Patient login
     user = user_collection.find_one({"username": username})
     if not user:
+        logging.warning(f"Login failed: Username not found - {username}")
         return jsonify({"error": "Username not found"}), 404
 
     try:
         decrypted_password = decrypt_data(user["password"])
     except Exception as e:
+        logging.error(f"Login failed: Password decryption error for user {username}: {str(e)}")
         return jsonify({"error": "Password decryption failed"}), 500
 
     if password == decrypted_password:
         access_token = create_access_token(identity=str(user["pid"]), additional_claims={"username": username, "role": "patient"})
+        logging.info(f"Login successful for user: {username}")
         return jsonify({
             "message": "Verification successful",
             "pid": user["pid"],
@@ -146,6 +162,7 @@ def login():
             "token": access_token
         }), 200
     else:
+        logging.warning(f"Login failed: Wrong password for user {username}")
         return jsonify({"error": "Wrong password"}), 401
 
 
@@ -198,6 +215,7 @@ def get_data(pid):
     claims = get_jwt()              # This will be a dict with "role"
 
     if claims.get("role") != "patient" or token_pid != pid:
+        logging.warning(f"Unauthorized data access attempt by PID {token_pid} for PID {pid}")
         return jsonify({"error": "Unauthorized"}), 403
 
     try:
@@ -219,8 +237,10 @@ def get_data(pid):
             })
 
         if records:
+            logging.info(f"Data retrieved for patient {pid}, count={len(records)}")
             return jsonify({"data": records}), 200
         else:
+            logging.warning(f"No records found for patient {pid}")
             return jsonify({"error": "No records found for this patient"}), 404
 
     except Exception as e:
@@ -273,6 +293,7 @@ def create_request():
         image_content = image_file.read()
         if not image_content:
             print("Image content is empty")
+            logging.warning("Image upload failed: content is empty")
             return jsonify({"error": "Image file is empty"}), 400
 
         image_data = base64.b64encode(image_content).decode("utf-8")
@@ -281,6 +302,7 @@ def create_request():
 
         files = {"image": (image_file.filename, image_file_io, image_file.content_type)}
         print("Sending image to ML service...")
+        logging.info(f"Sending image for prediction for patient_id={patient_id}")
 
         # ml_response = requests.post("http://127.0.0.1:5001/predict", files=files)
         # ml_response = requests.post("http://ml-service:5001/predict", files=files)
@@ -293,10 +315,12 @@ def create_request():
             ml_data = ml_response.json()
         except ValueError:
             print("Invalid JSON from ML service:", ml_response.text)
+            logging.error("Failed to parse ML service response JSON")
             return jsonify({"error": "Invalid response from ML service"}), 500
 
         ml_diagnosis = ml_data.get("predicted_class", "Unknown")
         print("Diagnosis from ML:", ml_diagnosis)
+        logging.info(f"ML diagnosis result for patient_id={patient_id}: {ml_diagnosis}")
 
         date = datetime.now().strftime("%Y-%m-%d")
         new_entry = {
@@ -317,6 +341,7 @@ def create_request():
 
     except Exception as e:
         print(f"Error: {e}")
+        logging.error(f"Exception in create-request: {str(e)}")
         return jsonify({"error": str(e)}), 500
 
     
@@ -336,10 +361,12 @@ def get_pending_requests():
     claims = get_jwt()             # dict with "role"
 
     if claims.get("role") != "doctor":
+        logging.warning(f"Unauthorized access attempt by identity={identity}")
         return jsonify({"error": "Unauthorized"}), 403
 
     try:
         # Fetch requests with status "Pending" from the MongoDB collection
+        logging.info(f"Doctor {identity} fetching pending requests")
         pending_requests = request_collection.find({"status": "Pending"})
 
         results = []
@@ -357,6 +384,7 @@ def get_pending_requests():
         return jsonify({"data": results}), 200
 
     except Exception as e:
+        logging.error(f"Failed to retrieve pending requests: {str(e)}")
         return jsonify({"error": f"Failed to retrieve pending requests: {str(e)}"}), 500
 
 
@@ -367,11 +395,13 @@ def update_diagnosis():
     claims = get_jwt()             # dict with "role"
 
     if claims.get("role") != "doctor":
+        logging.warning(f"Unauthorized attempt to update diagnosis by identity={identity}")
         return jsonify({"error": "Unauthorized"}), 403
 
     try:
         data = request.json
-        print(data)
+        logging.info(f"Received update request from doctor {identity}: {data}")
+        # print(data)
 
         _id = ObjectId(data['appointment_id'])
 
@@ -389,6 +419,7 @@ def update_diagnosis():
         return jsonify({"message": "Diagnosis updated"}), 200
 
     except Exception as e:
+        logging.error(f"Error while updating diagnosis: {str(e)}")
         return jsonify({"error": str(e)}), 500
 
 
