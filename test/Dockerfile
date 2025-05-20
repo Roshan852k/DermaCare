@@ -11,4 +11,4 @@ COPY test_model.py .
 COPY img/ img/
 
 # Run test
-CMD ["python", "test_app.py"]
+CMD ["python", "test_model.py"]
