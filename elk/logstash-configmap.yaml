@@ -2,36 +2,20 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: logstash-config
-  namespace: elk
 data:
   logstash.conf: |
     input {
-      tcp {
-        port => 5000
-        codec => json
-      }
-    }
-
-    filter {
-      json {
-        source => "message"
-        skip_on_invalid_json => true
-      }
-
-      mutate {
-        add_field => {
-          "service" => "%{[application]}"
-        }
+      file {
+        path => "/var/log/backend/app.log"
+        start_position => "beginning"
+        sincedb_path => "/dev/null"
       }
     }
 
     output {
       elasticsearch {
         hosts => ["http://elasticsearch:9200"]
-        index => "springboot-logs-%{+YYYY.MM.dd}"
+        index => "backend-logs-%{+YYYY.MM.dd}"
       }
-
-      stdout {
-        codec => rubydebug
-      }
+      stdout { codec => rubydebug }
     }
