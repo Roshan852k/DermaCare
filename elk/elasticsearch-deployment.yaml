@@ -70,6 +70,20 @@ spec:
 
 ---
 # Elasticsearch Service
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   name: elasticsearch
+#   namespace: default  
+# spec:
+#   selector:
+#     app: elasticsearch
+#   ports:
+#   - protocol: TCP
+#     port: 9200
+#     targetPort: 9200
+#   type: ClusterIP
+
 apiVersion: v1
 kind: Service
 metadata:
@@ -82,4 +96,7 @@ spec:
   - protocol: TCP
     port: 9200
     targetPort: 9200
-  type: ClusterIP
+    # Optionally specify a nodePort within 30000-32767 range
+    # nodePort: 31000
+  type: NodePort
+
