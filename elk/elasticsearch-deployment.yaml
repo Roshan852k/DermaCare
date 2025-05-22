@@ -3,6 +3,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: elasticsearch
+  namespace: default  
   labels:
     app: elasticsearch
 spec:
@@ -59,6 +60,7 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: elasticsearch-pvc
+  namespace: default  
 spec:
   accessModes:
     - ReadWriteOnce
@@ -72,6 +74,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: elasticsearch
+  namespace: default  
 spec:
   selector:
     app: elasticsearch
