@@ -96,7 +96,6 @@ spec:
   - protocol: TCP
     port: 9200
     targetPort: 9200
-    # Optionally specify a nodePort within 30000-32767 range
-    # nodePort: 31000
+    nodePort: 31000
   type: NodePort
 
