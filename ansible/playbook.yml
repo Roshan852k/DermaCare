@@ -8,13 +8,6 @@
     - kubernetes.core
 
   tasks:
-    - name: Create elk namespace
-      kubernetes.core.k8s:
-        api_version: v1
-        kind: Namespace
-        name: elk
-        state: present
-
     - name: Apply Elasticsearch deployment
       kubernetes.core.k8s:
         state: present
