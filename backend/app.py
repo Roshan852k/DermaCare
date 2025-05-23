@@ -64,11 +64,18 @@ if counter_collection.count_documents({"_id": "patient_id"}) == 0:
     counter_collection.insert_one({"_id": "patient_id", "seq": 1000})
 
 # Set up logging
+# logging.basicConfig(
+#     filename='app.log',           # <--- This is the log file
+#     level=logging.INFO,
+#     format='%(asctime)s %(levelname)s: %(message)s'
+# )
+
 logging.basicConfig(
-    filename='app.log',           # <--- This is the log file
+    filename='/var/log/backend/app.log',
     level=logging.INFO,
     format='%(asctime)s %(levelname)s: %(message)s'
 )
+
 
 # Auto-increment functions
 def get_next_user_pid():
