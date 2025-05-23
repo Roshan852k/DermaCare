@@ -13,6 +13,18 @@ data:
       }
     }
 
+    filter {
+      grok {
+        # Extract timestamp, log level, and message parts from your log line
+        match => { "message" => "%{TIMESTAMP_ISO8601:timestamp} \[%{LOGLEVEL:level}\] %{GREEDYDATA:msg}" }
+      }
+      date {
+        match => [ "timestamp", "ISO8601" ]
+        target => "@timestamp"
+      }
+    }
+
+
     output {
       elasticsearch {
         hosts => ["http://elasticsearch:9200"]
