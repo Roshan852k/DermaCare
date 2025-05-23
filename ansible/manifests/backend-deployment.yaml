@@ -33,8 +33,9 @@ spec:
               cpu: 500m
           volumeMounts:
             - name: backend-logs
-              mountPath: /var/log/backend  
+              mountPath: /var/log/backend
       volumes:
         - name: backend-logs
-          emptyDir: {}                   
-
+          hostPath:
+            path: /var/log/backend
+            type: DirectoryOrCreate
