@@ -70,6 +70,9 @@ if counter_collection.count_documents({"_id": "patient_id"}) == 0:
 #     format='%(asctime)s %(levelname)s: %(message)s'
 # )
 
+log_dir = '/var/log/backend'
+os.makedirs(log_dir, exist_ok=True)
+
 logging.basicConfig(
     filename='/var/log/backend/app.log',
     level=logging.INFO,
