@@ -36,6 +36,32 @@ pipeline {
                 }
             }
         }
+        
+        stage('Run Backend Tests Inside Container') {
+            steps {
+                script {
+                    sh '''
+                        docker network create test-net || true
+                        
+                        docker rm -f ml-service || true
+                        
+                        docker run -d --name ml-service --network test-net -p 5001:5001 $MLSERVICE_IMAGE
+                        
+                        sleep 10
+                        
+                        docker build -t backend-test ./test
+                        
+                        docker run --rm --network test-net backend-test || EXIT_CODE=$?
+                        
+                        docker stop ml-service || true
+                        
+                        exit $EXIT_CODE
+                    '''
+                }
+            }
+        }
+
+
 
         stage('Push Docker Images') {
             parallel {
@@ -106,4 +132,3 @@ pipeline {
         }
     }
 }
-
